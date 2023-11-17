@@ -38,7 +38,7 @@ pub async fn process_payload(req: Request<Body>) -> Result<Response<Body>, Error
             log.info(&format!("payload {:#?}", payload));
             let obj = serde_json::from_slice::<CustomerDetails>(&payload).unwrap();
             let json_data = serde_json::to_string(&obj).unwrap();
-            log.trace(&format!("json payload {:#?}", json_data));
+            log.info(&format!("publish to topic {:#?}", topic));
             // publish to message queue
             let client = redis::Client::open(host).unwrap();
             let mut con = client.get_connection().unwrap();
