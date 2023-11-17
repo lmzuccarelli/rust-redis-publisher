@@ -1,8 +1,9 @@
 use hyper::server::conn::Http;
 use hyper::service::service_fn;
+use std::env;
 use std::net::SocketAddr;
+use std::process;
 use tokio::net::TcpListener;
-
 // define local modules
 mod api;
 mod handlers;
@@ -18,7 +19,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         log_level: Level::TRACE,
     };
 
-    let addr = SocketAddr::from(([0, 0, 0, 0], 8080));
+    // exit process as SERVER_PORT envar is not set
+    if env::var("SERVER_PORT").is_err() {
+        log.error("envar SERVER_PORT (mandatory) is not set");
+        process::exit(-1);
+    }
+
+    let port = env::var("SERVER_PORT").unwrap().parse::<u16>().unwrap();
+
+    let addr = SocketAddr::from(([0, 0, 0, 0], port));
     let listener = TcpListener::bind(addr).await?;
     log.info(&format!("Listening on http://{}", addr));
     loop {

@@ -107,7 +107,16 @@ impl Logging {
     }
     /// error
     pub fn error(&self, msg: &str) {
-        println!("\x1b[1;91m {} \x1b[0m : {}", "ERROR", msg);
+        let dt = Local::now();
+        let naive_utc = dt.naive_utc();
+        let offset = dt.offset().clone();
+        let dt_new = DateTime::<Local>::from_naive_utc_and_offset(naive_utc, offset);
+        println!(
+            "\x1b[1;91m [ {} {} ] \x1b[0m : {}",
+            "ERROR",
+            dt_new.to_rfc3339(),
+            msg
+        );
     }
 }
 
