@@ -8,6 +8,9 @@ TEST ?= ""
 build: clean 
 	cargo build
 
+build-release: clean
+	cargo build --release
+
 test: clean
 	CARGO_INCREMENTAL=0 RUSTFLAGS='-Cinstrument-coverage' LLVM_PROFILE_FILE='cargo-test-%p-%m.profraw' cargo test  -- --nocapture
 
@@ -21,7 +24,6 @@ cover:
 
 run:
 	cargo run 
-
 
 clean:
 	rm -rf cargo-test*
