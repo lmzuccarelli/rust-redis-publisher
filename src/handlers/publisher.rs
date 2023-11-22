@@ -1,6 +1,6 @@
+use gethostname::gethostname;
 use hyper::body;
 use hyper::{Body, Error, Method, Request, Response};
-//use redis::Commands;
 use std::env;
 
 use crate::api::schema::*;
@@ -37,11 +37,14 @@ pub async fn process_payload<T: MessageQueueInterface>(
             q.publish(log, json_data, host, topic).unwrap();
 
             Ok(Response::new(Body::from(
-                "json data successfully published to message queue",
+                "json data successfully published to message queue from ".to_owned()
+                    + gethostname().to_str().unwrap(),
             )))
         }
         // health endpoint
-        (&Method::GET, "/isalive") => Ok(Response::new(Body::from("ok"))),
+        (&Method::GET, "/isalive") => Ok(Response::new(Body::from(
+            "ok from ".to_owned() + gethostname().to_str().unwrap(),
+        ))),
         // all other routes
         _ => Ok(Response::new(Body::from(
             "ensure you post to the /publish endpoint with valid json",
