@@ -1,9 +1,11 @@
+use api::schema::ImplMessageQueueInterface;
 use hyper::server::conn::Http;
 use hyper::service::service_fn;
 use std::env;
 use std::net::SocketAddr;
 use std::process;
 use tokio::net::TcpListener;
+
 // define local modules
 mod api;
 mod handlers;
@@ -33,10 +35,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     loop {
         let (stream, _) = listener.accept().await?;
         tokio::task::spawn(async move {
+            let real = ImplMessageQueueInterface {};
             if let Err(err) = Http::new()
                 .http1_only(true)
                 .http1_keep_alive(true)
-                .serve_connection(stream, service_fn(process_payload))
+                .serve_connection(
+                    stream,
+                    service_fn(move |req| process_payload(req, log, real)),
+                )
                 .await
             {
                 log.error(&format!("Error serving connection: {:}", err));
